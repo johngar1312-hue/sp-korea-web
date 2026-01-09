@@ -5,7 +5,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('https://sp-korea-api.onrender.com/api/products')
+    fetch('https://sp-korea-api.onrender.com/api/products') // ✅ Работает!
       .then(res => res.json())
       .then(data => {
         setProducts(data);
