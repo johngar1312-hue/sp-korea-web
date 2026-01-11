@@ -1,5 +1,6 @@
 import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import SanitizedDescription from '../components/SanitizedDescription';
 
 const ProductDetail = ({ products, addToCart }) => {
   const { id } = useParams();
@@ -62,9 +63,7 @@ const ProductDetail = ({ products, addToCart }) => {
               {product.volume && <p className="text-sm text-gray-500 mb-2"><strong>Объём:</strong> {product.volume}</p>}
               <p className="text-lg font-bold text-green-600 mb-6">{product.price_rub} ₽</p>
               
-              <p className="text-gray-700 mb-6">
-                {product.description || 'Полное описание временно недоступно. Свяжитесь с администратором для уточнения деталей.'}
-              </p>
+              <SanitizedDescription html={product.description || 'Полное описание временно недоступно. Свяжитесь с администратором для уточнения деталей.'} />
 
               <div className="flex space-x-4">
                 <button 

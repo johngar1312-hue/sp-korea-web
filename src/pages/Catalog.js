@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 
 const Catalog = ({ products, loading, addToCart }) => {
+  console.log('Catalog props:', { products, loading, addToCart });
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
