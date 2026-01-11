@@ -2,7 +2,7 @@ import React from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import SanitizedDescription from '../components/SanitizedDescription';
 
-const ProductDetail = ({ products, addToCart }) => {
+const ProductDetail = ({ products, addToCart, cart, updateQuantity }) => {
   const { id } = useParams();
   const navigate = useNavigate();
   const product = products.find(p => p.id === parseInt(id));
@@ -66,12 +66,30 @@ const ProductDetail = ({ products, addToCart }) => {
               <SanitizedDescription html={product.description || 'Полное описание временно недоступно. Свяжитесь с администратором для уточнения деталей.'} />
 
               <div className="flex space-x-4">
-                <button 
-                  onClick={() => addToCart(product)}
-                  className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700"
-                >
-                  📦 Добавить в корзину
-                </button>
+                {cart.find(item => item.id === product.id) ? (
+                  <div className="flex items-center space-x-2 flex-1">
+                    <button 
+                      onClick={() => updateQuantity(product.id, Math.max(1, cart.find(item => item.id === product.id).quantity - 1))}
+                      className="w-10 h-10 flex items-center justify-center border rounded hover:bg-gray-100"
+                    >
+                      -
+                    </button>
+                    <span className="w-8 text-center font-medium">{cart.find(item => item.id === product.id).quantity}</span>
+                    <button 
+                      onClick={() => updateQuantity(product.id, cart.find(item => item.id === product.id).quantity + 1)}
+                      className="w-10 h-10 flex items-center justify-center border rounded hover:bg-gray-100"
+                    >
+                      +
+                    </button>
+                  </div>
+                ) : (
+                  <button 
+                    onClick={() => addToCart(product)}
+                    className="flex-1 bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700"
+                  >
+                    📦 Добавить в корзину
+                  </button>
+                )}
               </div>
             </div>
           </div>
