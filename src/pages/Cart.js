@@ -16,6 +16,8 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
         })),
         total: totalPrice
       }));
+      // Закрываем WebApp после отправки
+      window.Telegram.WebApp.close();
     } else {
       alert(`Ваш заказ на сумму ${totalPrice} ₽. Перейдите в бота для оформления.`);
     }
