@@ -1,4 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Catalog from './pages/Catalog';
+import ProductDetail from './pages/ProductDetail';
+import Cart from './pages/Cart';
+import Navbar from './components/Navbar';
 
 function App() {
   const [products, setProducts] = useState([]);
@@ -18,14 +24,6 @@ function App() {
       });
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <p className="text-xl text-gray-600">Загрузка товаров...</p>
-      </div>
-    );
-  }
-
   const addToCart = (product) => {
     setCart(prev => {
       const item = prev.find(p => p.id === product.id);
@@ -38,80 +36,30 @@ function App() {
     });
   };
 
-  const openProduct = (product) => {
-    // В контексте Telegram WebApp, откроем через WebApp.showPopup или передадим в бота
-    if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.sendData(JSON.stringify({
-        type: 'product_detail',
-        product: product
-      }));
-    } else {
-      alert(`Подробнее о: ${product.name}\n${product.description || 'Описание временно недоступно'}`);
-    }
+  const updateQuantity = (productId, newQuantity) => {
+    setCart(prev => 
+      prev.map(item => 
+        item.id === productId ? { ...item, quantity: newQuantity } : item
+      )
+    );
+  };
+
+  const removeFromCart = (productId) => {
+    setCart(prev => prev.filter(item => item.id !== productId));
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <header className="bg-white shadow-sm">
-        <div className="max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900">SP Korea 🇰🇷</h1>
-            <p className="text-gray-600">Оригинальная корейская косметика</p>
-          </div>
-          <button 
-            onClick={() => {
-              if (window.Telegram?.WebApp) {
-                window.Telegram.WebApp.sendData(JSON.stringify({
-                  type: 'open_cart',
-                  cart: cart
-                }));
-              } else {
-                alert('Корзина: ' + cart.map(p => `${p.name} ×${p.quantity}`).join('\n') || 'Пусто');
-              }
-            }}
-            className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-1 hover:bg-green-700"
-          >
-            <span>🛒</span>
-            <span>Корзина</span>
-            {cart.length > 0 && <span className="bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">{cart.reduce((sum, item) => sum + item.quantity, 0)}</span>}
-          </button>
-        </div>
-      </header>
-
-      <main className="max-w-5xl mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {products.map((product) => (
-            <div key={product.id} className="bg-white rounded-lg shadow-sm overflow-hidden hover:shadow-md transition-shadow">
-              <img
-                src={product.image_url}
-                alt={product.name}
-                className="w-full h-64 object-cover"
-                onError={(e) => e.target.src='https://via.placeholder.com/300x300?text=No+Image'}
-              />
-              <div className="p-4">
-                <h3 className="font-semibold text-gray-900">{product.name}</h3>
-                <p className="text-sm text-gray-500">{product.brand} · {product.volume}</p>
-                <p className="mt-2 text-lg font-bold text-green-600">{product.price_rub} ₽</p>
-                <div className="mt-4 flex space-x-2">
-                  <button 
-                    onClick={() => openProduct(product)}
-                    className="flex-1 bg-blue-600 text-white py-2 rounded text-sm hover:bg-blue-700"
-                  >
-                    🔍 Подробнее
-                  </button>
-                  <button 
-                    onClick={() => addToCart(product)}
-                    className="flex-1 bg-green-600 text-white py-2 rounded text-sm hover:bg-green-700"
-                  >
-                    📦 В корзину
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-      </main>
-    </div>
+    <Router>
+      <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/catalog" element={<Catalog products={products} loading={loading} addToCart={addToCart} />} />
+          <Route path="/product/:id" element={<ProductDetail products={products} addToCart={addToCart} />} />
+          <Route path="/cart" element={<Cart cart={cart} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />} />
+        </Routes>
+      </div>
+    </Router>
   );
 }
 
