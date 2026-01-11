@@ -4,6 +4,9 @@ import Home from './pages/Home';
 import Catalog from './pages/Catalog';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
+import Delivery from './pages/Delivery';
+import About from './pages/About';
+import Contact from './pages/Contact';
 import Navbar from './components/Navbar';
 import Toast from './components/Toast';
 
@@ -65,6 +68,9 @@ function App() {
           <Route path="/catalog" element={<Catalog products={products} loading={loading} addToCart={addToCart} cart={cart} updateQuantity={updateQuantity} />} />
           <Route path="/product/:id" element={<ProductDetail products={products} addToCart={addToCart} cart={cart} updateQuantity={updateQuantity} />} />
           <Route path="/cart" element={<Cart cart={cart} updateQuantity={updateQuantity} removeFromCart={removeFromCart} />} />
+          <Route path="/delivery" element={<Delivery />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/contact" element={<Contact />} />
         </Routes>
         <Toast message={toast.message} isVisible={toast.isVisible} onClose={closeToast} />
       </div>
