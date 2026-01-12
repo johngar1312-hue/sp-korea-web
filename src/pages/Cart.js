@@ -30,8 +30,8 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
       try {
         window.Telegram.WebApp.sendData(JSON.stringify(orderData));
         console.log('✅ Данные успешно отправлены в бота');
-        // Закрываем WebApp после отправки
-        window.Telegram.WebApp.close();
+        // Убрали закрытие WebApp — пусть пользователь закроет сам
+        alert('Заказ отправлен! Администратор свяжется с вами.');
       } catch (error) {
         console.error('❌ Ошибка при отправке данных:', error);
         alert('Ошибка при отправке данных. Попробуйте ещё раз.');
