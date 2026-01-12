@@ -7,17 +7,29 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   const totalPrice = cart.reduce((sum, item) => sum + (item.price_rub * item.quantity), 0);
 
   const handleCheckout = () => {
+    console.log('Начало оформления заказа');
+    
+    const orderData = {
+      type: 'checkout',
+      order: cart.map(item => ({
+        id: item.id,
+        quantity: item.quantity
+      })),
+      total: totalPrice
+    };
+    
+    console.log('Данные для отправки:', orderData);
+    
     if (window.Telegram?.WebApp) {
-      window.Telegram.WebApp.sendData(JSON.stringify({
-        type: 'checkout',
-        order: cart.map(item => ({
-          id: item.id,
-          quantity: item.quantity
-        })),
-        total: totalPrice
-      }));
-      // Закрываем WebApp после отправки
-      window.Telegram.WebApp.close();
+      try {
+        window.Telegram.WebApp.sendData(JSON.stringify(orderData));
+        console.log('✅ Данные успешно отправлены в бота');
+        // Закрываем WebApp после отправки
+        window.Telegram.WebApp.close();
+      } catch (error) {
+        console.error('❌ Ошибка при отправке данных:', error);
+        alert('Ошибка при отправке данных. Попробуйте ещё раз.');
+      }
     } else {
       alert(`Ваш заказ на сумму ${totalPrice} ₽. Перейдите в бота для оформления.`);
     }
