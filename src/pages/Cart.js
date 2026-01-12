@@ -12,7 +12,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     localStorage.setItem('cart', JSON.stringify(cart));
   }, [cart]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
     console.log('Начало оформления заказа');
     
     const orderData = {
@@ -26,18 +26,40 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     
     console.log('Данные для отправки:', orderData);
     
-    if (window.Telegram?.WebApp) {
-      try {
-        window.Telegram.WebApp.sendData(JSON.stringify(orderData));
-        console.log('✅ Данные успешно отправлены в бота');
-        // Убрали закрытие WebApp — пусть пользователь закроет сам
-        alert('Заказ отправлен! Администратор свяжется с вами.');
-      } catch (error) {
-        console.error('❌ Ошибка при отправке данных:', error);
-        alert('Ошибка при отправке данных. Попробуйте ещё раз.');
+    // Генерируем уникальный ID корзины
+    const cartId = Date.now().toString();
+    
+    // Сохраняем в localStorage
+    localStorage.setItem(`cart_${cartId}`, JSON.stringify(cart));
+    
+    try {
+      // Отправляем корзину на наш API
+      const response = await fetch('https://sp-korea-api.onrender.com/api/temp-cart/' + cartId, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData.order)
+      });
+      
+      if (!response.ok) {
+        throw new Error(`Ошибка сети: ${response.status}`);
       }
-    } else {
-      alert(`Ваш заказ на сумму ${totalPrice} ₽. Перейдите в бота для оформления.`);
+      
+      console.log('✅ Корзина сохранена на сервере');
+      
+      // Формируем ссылку для перехода в бот
+      const botUrl = `https://t.me/koreazakupkabot?start=order_${cartId}`;
+      
+      // Открываем бота
+      window.open(botUrl, '_blank');
+      
+      // Показываем уведомление
+      alert('Заказ сохранён! Откройте бота для подтверждения.');
+      
+    } catch (error) {
+      console.error('❌ Ошибка при сохранении корзины:', error);
+      alert('Не удалось сохранить заказ. Проверьте интернет и попробуйте ещё раз.');
     }
   };
 
