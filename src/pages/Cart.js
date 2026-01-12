@@ -1,10 +1,16 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   const navigate = useNavigate();
   
   const totalPrice = cart.reduce((sum, item) => sum + (item.price_rub * item.quantity), 0);
+
+  // Синхронизация с localStorage при изменении корзины
+  useEffect(() => {
+    localStorage.setItem('cart', JSON.stringify(cart));
+  }, [cart]);
 
   const handleCheckout = () => {
     console.log('Начало оформления заказа');

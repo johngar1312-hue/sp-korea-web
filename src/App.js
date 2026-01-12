@@ -13,7 +13,10 @@ import Toast from './components/Toast';
 function App() {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [cart, setCart] = useState([]);
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
   const [toast, setToast] = useState({ message: '', isVisible: false });
 
   useEffect(() => {
@@ -32,14 +35,19 @@ function App() {
   const addToCart = (product) => {
     setCart(prev => {
       const item = prev.find(p => p.id === product.id);
+      let newCart;
       if (item) {
-        return prev.map(p => 
+        newCart = prev.map(p => 
           p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
         );
+      } else {
+        newCart = [...prev, { ...product, quantity: 1 }];
+        // Показываем тост при первом добавлении
+        setToast({ message: `Товар добавлен: ${product.name}`, isVisible: true });
       }
-      // Показываем тост при первом добавлении
-      setToast({ message: `Товар добавлен: ${product.name}`, isVisible: true });
-      return [...prev, { ...product, quantity: 1 }];
+      // Сохраняем в localStorage
+      localStorage.setItem('cart', JSON.stringify(newCart));
+      return newCart;
     });
   };
 
@@ -48,16 +56,24 @@ function App() {
   };
 
   const updateQuantity = (productId, newQuantity) => {
-    setCart(prev => 
-      prev.map(item => 
+    setCart(prev => {
+      const newCart = prev.map(item => 
         item.id === productId ? { ...item, quantity: newQuantity } : item
-      )
-    );
+      ).filter(item => item.quantity > 0);
+      localStorage.setItem('cart', JSON.stringify(newCart));
+      return newCart;
+    });
   };
 
   const removeFromCart = (productId) => {
-    setCart(prev => prev.filter(item => item.id !== productId));
+    setCart(prev => {
+      const newCart = prev.filter(item => item.id !== productId);
+      localStorage.setItem('cart', JSON.stringify(newCart));
+      return newCart;
+    });
   };
+
+
 
   return (
     <Router>
