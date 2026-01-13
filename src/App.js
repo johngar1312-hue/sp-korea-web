@@ -20,14 +20,20 @@ function App() {
   const [toast, setToast] = useState({ message: '', isVisible: false });
 
   useEffect(() => {
-    fetch('https://sp-korea-api.onrender.com/api/products') // ✅ Работает!
-      .then(res => res.json())
+    // ✅ Указываем полный URL до API на Render
+    fetch('https://sp-korea-api.onrender.com/api/products')
+      .then(res => {
+        if (!res.ok) throw new Error('Сеть не отвечает');
+        return res.json();
+      })
       .then(data => {
-        setProducts(data);
+        // Убедимся, что data — массив
+        setProducts(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(err => {
-        console.error('Ошибка загрузки товаров:', err);
+        console.error('❌ Ошибка загрузки товаров:', err);
+        setToast({ message: 'Не удалось загрузить товары', isVisible: true });
         setLoading(false);
       });
   }, []);
@@ -37,15 +43,13 @@ function App() {
       const item = prev.find(p => p.id === product.id);
       let newCart;
       if (item) {
-        newCart = prev.map(p => 
+        newCart = prev.map(p =>
           p.id === product.id ? { ...p, quantity: p.quantity + 1 } : p
         );
       } else {
         newCart = [...prev, { ...product, quantity: 1 }];
-        // Показываем тост при первом добавлении
-        setToast({ message: `Товар добавлен: ${product.name}`, isVisible: true });
+        setToast({ message: `✅ Добавлено: ${product.name}`, isVisible: true });
       }
-      // Сохраняем в localStorage
       localStorage.setItem('cart', JSON.stringify(newCart));
       return newCart;
     });
@@ -57,7 +61,7 @@ function App() {
 
   const updateQuantity = (productId, newQuantity) => {
     setCart(prev => {
-      const newCart = prev.map(item => 
+      const newCart = prev.map(item =>
         item.id === productId ? { ...item, quantity: newQuantity } : item
       ).filter(item => item.quantity > 0);
       localStorage.setItem('cart', JSON.stringify(newCart));
@@ -72,8 +76,6 @@ function App() {
       return newCart;
     });
   };
-
-
 
   return (
     <Router>
