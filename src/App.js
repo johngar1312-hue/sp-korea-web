@@ -21,7 +21,7 @@ function App() {
 
   useEffect(() => {
     // ✅ Указываем полный URL до API на Render
-    fetch('https://v9j72n-158-160-95-239.ru.tuna.am/api')
+    fetch('https://v9j72n-158-160-95-239.ru.tuna.am/api/products')
       .then(res => {
         if (!res.ok) throw new Error('Сеть не отвечает');
         return res.json();
