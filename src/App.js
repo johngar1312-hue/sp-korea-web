@@ -20,7 +20,7 @@ function App() {
   const [toast, setToast] = useState({ message: '', isVisible: false });
 
   useEffect(() => {
-    // ✅ Указываем полный URL до API на Render
+    // ✅ Указываем полный URL до API 
     fetch('https://api.spkorea.online/api')
       .then(res => {
         if (!res.ok) throw new Error('Сеть не отвечает');
