@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 
 const Catalog = ({ products, loading, addToCart, cart, updateQuantity }) => {
@@ -13,6 +13,7 @@ const Catalog = ({ products, loading, addToCart, cart, updateQuantity }) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* остальной JSX остаётся без изменений */}
       <header className="bg-white shadow-sm">
         <div className="max-w-5xl mx-auto px-4 py-6 flex justify-between items-center">
           <div>
