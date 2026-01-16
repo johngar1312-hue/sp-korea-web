@@ -21,7 +21,7 @@ function App() {
 
   useEffect(() => {
     // ✅ Указываем полный URL до API на Render
-    fetch('https://sp-korea-api.onrender.com/api/products')
+    fetch('https://api.spkorea.online/api/products')
       .then(res => {
         if (!res.ok) throw new Error('Сеть не отвечает');
         return res.json();
