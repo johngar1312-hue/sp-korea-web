@@ -1,3 +1,5 @@
+// src/pages/Cart.js
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -8,16 +10,19 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     // Генерируем уникальный ID заказа
     const cartId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // Отправляем корзину на API
-    fetch(`https://sp-korea-api.onrender.com/api/temp-cart/${cartId}`, {
+    // ✅ Отправляем корзину на НОВЫЙ API
+    fetch(`https://api.spkorea.online/api/temp-cart/${cartId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(cart),
+      body: JSON.stringify({
+        items: cart,  // ✅ Важно: API ожидает { items: [...] }
+        timestamp: new Date().toISOString()
+      }),
     })
       .then(response => {
         if (response.ok) {
-          // Открываем Telegram-бота с передачей cartId
-          window.open(`https://t.me/koreazakupkabot?start=${cartId}`, '_blank');
+          // ✅ Передаём cartId в Telegram-бота
+          window.open(`https://t.me/koreazakupkabot?start=order_${cartId}`, '_blank');
         } else {
           alert('Ошибка сохранения заказа. Попробуйте позже.');
         }
