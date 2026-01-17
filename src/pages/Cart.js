@@ -32,7 +32,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
       .then(response => {
         if (response.ok) {
           // Передаём cartId в бота
-          window.open(`https://t.me/koreazakupkabot?start=order_${cartId}`, '_blank');
+          window.open(`https://t.me/koreazakupkabot?start=${cartId}`, '_blank');
         } else {
           alert('Ошибка сохранения заказа. Попробуйте позже.');
         }
