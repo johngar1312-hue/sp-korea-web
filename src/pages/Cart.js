@@ -10,18 +10,18 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     // Генерируем уникальный ID заказа
     const cartId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // ✅ Отправляем корзину на НОВЫЙ API
+    // ✅ Отправляем корзину в формате { items: [...] }
     fetch(`https://api.spkorea.online/api/temp-cart/${cartId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        items: cart,  // ✅ Важно: API ожидает { items: [...] }
+        items: cart,  // ✅ API ожидает объект с ключом "items"
         timestamp: new Date().toISOString()
       }),
     })
       .then(response => {
         if (response.ok) {
-          // ✅ Передаём cartId в Telegram-бота
+          // Передаём cartId в Telegram-бота
           window.open(`https://t.me/koreazakupkabot?start=order_${cartId}`, '_blank');
         } else {
           alert('Ошибка сохранения заказа. Попробуйте позже.');
