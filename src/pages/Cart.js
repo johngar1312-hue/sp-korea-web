@@ -6,10 +6,12 @@ import { Link } from 'react-router-dom';
 const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   const total = cart.reduce((sum, item) => sum + item.price_rub * item.quantity, 0);
   const [checkoutStep, setCheckoutStep] = useState('form'); // 'form' | 'success'
+  const [cartId, setCartId] = useState(null);
 
   const handleCheckout = () => {
     // Генерируем уникальный ID заказа
-    const cartId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    const newCartId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+    setCartId(newCartId);
 
     // Форматируем данные для API
     const cartToSend = cart.map(item => ({
@@ -22,7 +24,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
       image_url: item.image_url
     }));
 
-    fetch(`https://api.spkorea.online/api/temp-cart/${cartId}`, {
+    fetch(`https://api.spkorea.online/api/temp-cart/${newCartId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -53,6 +55,9 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   }
 
   if (checkoutStep === 'success') {
+    // 🔗 Ссылка с start параметром
+    const botLink = `https://t.me/koreazakupkabot?start=${cartId}`;
+
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 text-center">
         <h1 className="text-2xl font-bold mb-6">✅ Заказ сохранён!</h1>
@@ -63,16 +68,15 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
           Как всё будет готово — вы получите уведомление и ссылку на оплату.
         </p>
         
-        {/* Кнопка "Перейти в бота" */}
+        {/* Кнопка "Перейти в бота с cartId */ 
         <a
-          href="https://t.me/koreazakupkabot"
+          href={botLink}
           target="_blank"
           rel="noopener noreferrer"
           className="inline-block bg-blue-600 text-white px-8 py-3 rounded hover:bg-blue-700 transition font-medium"
           onClick={() => {
-            // Явно открываем бота
             if (window.Telegram?.WebApp) {
-              window.Telegram.WebApp.openTelegramLink('https://t.me/koreazakupkabot');
+              window.Telegram.WebApp.openTelegramLink(botLink);
             }
           }}
         >
@@ -81,7 +85,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
 
         <div className="mt-8 p-4 bg-gray-100 rounded">
           <p className="text-sm text-gray-600">
-            Не перезагружайте эту страницу — ваш заказ уже отправлен.
+            Ваш заказ: <code className="text-red-600">{cartId}</code>
           </p>
         </div>
       </div>
