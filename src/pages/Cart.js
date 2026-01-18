@@ -1,16 +1,17 @@
 // src/pages/Cart.js
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   const total = cart.reduce((sum, item) => sum + item.price_rub * item.quantity, 0);
+  const [checkoutStep, setCheckoutStep] = useState('form'); // 'form' | 'success'
 
   const handleCheckout = () => {
     // Генерируем уникальный ID заказа
     const cartId = `order_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
-    // ✅ Отправляем в формате { items: [...] } на новый API
+    // Форматируем данные для API
     const cartToSend = cart.map(item => ({
       id: Number(item.id),
       article: item.article || "N/A",
@@ -31,21 +32,14 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
     })
       .then(response => {
         if (response.ok) {
-          // Передаём cartId в бота
-         if (window.Telegram?.WebApp) {
-  Telegram.WebApp.openTelegramLink(`https://t.me/koreazakupkabot?start=${cartId}`);
-  Telegram.WebApp.close(); // Закрывает веб-приложение
-} else {
-  // Fallback для браузера
-  window.location.href = `https://t.me/koreazakupkabot?start=${cartId}`;
-}
+          setCheckoutStep('success');
         } else {
           alert('Ошибка сохранения заказа. Попробуйте позже.');
         }
       })
       .catch(err => {
         console.error('❌ Ошибка отправки заказа:', err);
-        alert('Не удалось отправить заказ.');
+        alert('Не удалось отправить заказ. Проверьте интернет.');
       });
   };
 
@@ -54,6 +48,42 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
       <div className="text-center py-10">
         <p className="text-gray-500">Корзина пуста</p>
         <Link to="/catalog" className="text-blue-600 hover:underline">Перейти в каталог</Link>
+      </div>
+    );
+  }
+
+  if (checkoutStep === 'success') {
+    return (
+      <div className="max-w-4xl mx-auto px-4 py-8 text-center">
+        <h1 className="text-2xl font-bold mb-6">✅ Заказ сохранён!</h1>
+        <p className="text-gray-700 mb-6">
+          Администратор проверит наличие товаров в течение 24 часов.
+        </p>
+        <p className="text-gray-700 mb-8">
+          Как всё будет готово — вы получите уведомление и ссылку на оплату.
+        </p>
+        
+        {/* Кнопка "Перейти в бота" */}
+        <a
+          href="https://t.me/koreazakupkabot"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-block bg-blue-600 text-white px-8 py-3 rounded hover:bg-blue-700 transition font-medium"
+          onClick={() => {
+            // Явно открываем бота
+            if (window.Telegram?.WebApp) {
+              window.Telegram.WebApp.openTelegramLink('https://t.me/koreazakupkabot');
+            }
+          }}
+        >
+          💬 Перейти в бота
+        </a>
+
+        <div className="mt-8 p-4 bg-gray-100 rounded">
+          <p className="text-sm text-gray-600">
+            Не перезагружайте эту страницу — ваш заказ уже отправлен.
+          </p>
+        </div>
       </div>
     );
   }
