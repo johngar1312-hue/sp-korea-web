@@ -55,7 +55,6 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
   }
 
   if (checkoutStep === 'success') {
-    // 🔗 Ссылка с start параметром
     const botLink = `https://t.me/koreazakupkabot?start=${cartId}`;
 
     return (
@@ -67,8 +66,7 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
         <p className="text-gray-700 mb-8">
           Как всё будет готово — вы получите уведомление и ссылку на оплату.
         </p>
-        
-        {/* Кнопка "Перейти в бота с cartId */ 
+
         <a
           href={botLink}
           target="_blank"
