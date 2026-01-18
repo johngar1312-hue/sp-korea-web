@@ -32,7 +32,13 @@ const Cart = ({ cart, updateQuantity, removeFromCart }) => {
       .then(response => {
         if (response.ok) {
           // Передаём cartId в бота
-          window.location.href = `https://t.me/koreazakupkabot?start=${cartId}`;
+         if (window.Telegram?.WebApp) {
+  Telegram.WebApp.openTelegramLink(`https://t.me/koreazakupkabot?start=${cartId}`);
+  Telegram.WebApp.close(); // Закрывает веб-приложение
+} else {
+  // Fallback для браузера
+  window.location.href = `https://t.me/koreazakupkabot?start=${cartId}`;
+}
         } else {
           alert('Ошибка сохранения заказа. Попробуйте позже.');
         }
